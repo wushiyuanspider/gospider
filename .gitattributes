@@ -1,0 +1,7 @@
+*.go	text
+*.md	text
+*.html	text
+*.css	text
+*.js	text
+*.tpl	text
+*.conf	text
