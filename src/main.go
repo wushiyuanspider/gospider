@@ -24,6 +24,7 @@ func main() {
 
     if err != nil {
         fmt.Println(err)
+        return
     } else {
         fmt.Println("Name:\t", spider.name)
         fmt.Println("URL:\t", spider.startURL)
@@ -34,6 +35,7 @@ func main() {
     buffer, _, _ := reader.ReadLine()
     if  ok := string(buffer); ok == "y" || ok == "Y" || ok == "yes" {
         fmt.Printf("开始爬取 %s 的指定内容......\n", spider.startURL)
+        StartSearch(spider)
     } else {
         return
     }
