@@ -8,13 +8,13 @@ import (
 )
 
 type Spider struct {
-	name           string
-	startURL       string
-	depth          int
+	Name           string
+	StartURL       string
+	Depth          int
 	urls           map[string]*regexp.Regexp
 	contents       map[string]map[string]*regexp.Regexp
-	matchedURL     int
-	matchedContent int
+	MatchedURL     int
+	MatchedContent int
 	startTime      time.Time
 	endTime        time.Time
 }
@@ -28,17 +28,17 @@ func NewSpider(filepath string) (*Spider, error) {
 		return nil, err
 	}
 
-	spider.name, err = conf.GetValue("core", "name")
+	spider.Name, err = conf.GetValue("core", "name")
     if err != nil {
         return nil, err
     }
     
-	spider.startURL, err = conf.GetValue("core", "startURL")
+	spider.StartURL, err = conf.GetValue("core", "startURL")
     if err != nil {
         return nil, err
     }
     
-	spider.depth, err = conf.Int("core", "depth")
+	spider.Depth, err = conf.Int("core", "depth")
     if err != nil {
         return nil, err
     }
@@ -85,4 +85,22 @@ func NewSpider(filepath string) (*Spider, error) {
 	}
 
 	return spider, nil
+}
+
+func (s *Spider) GetURLName() []string {
+	// 注意这里创建了指定长度的空slice
+	// 千万不能使用append向slice中追加元素
+	// 因为append是向slice末尾添加元素，而不会像空slice中填元素
+	names := make([]string, len(s.urls))
+	var i int = 0
+	for key, _ := range s.urls {
+		names[i] = key
+		i++
+	}
+
+	return names
+}
+
+func (s *Spider) GetURLByName(name string) *regexp.Regexp {
+	return s.urls[name]
 }

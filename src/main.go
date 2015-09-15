@@ -26,16 +26,16 @@ func main() {
         fmt.Println(err)
         return
     } else {
-        fmt.Println("Name:\t", spider.name)
-        fmt.Println("URL:\t", spider.startURL)
-        fmt.Println("depth:\t", spider.depth)
+        fmt.Println("Name:\t", spider.Name)
+        fmt.Println("URL:\t", spider.StartURL)
+        fmt.Println("depth:\t", spider.Depth)
     }
     
     fmt.Printf("Start? (y/n):  ")
     buffer, _, _ := reader.ReadLine()
     if  ok := string(buffer); ok == "y" || ok == "Y" || ok == "yes" {
-        fmt.Printf("开始爬取 %s 的指定内容......\n", spider.startURL)
-        StartSearch(spider)
+        fmt.Printf("开始爬取 %s 的指定内容......\n", spider.StartURL)
+        Run(spider)
     } else {
         return
     }
