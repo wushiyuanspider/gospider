@@ -104,3 +104,25 @@ func (s *Spider) GetURLName() []string {
 func (s *Spider) GetURLByName(name string) *regexp.Regexp {
 	return s.urls[name]
 }
+
+// 给定一个URL Name，返回待搜索内容正则表达式的名字
+func (s *Spider) GetContentNames(urlName string) []string {
+	// con is map
+	con := s.contents[urlName]
+	if con == nil {
+		return nil
+	}
+	// 创建指定URL Name对应的content slice
+	names := make([]string, len(con))
+	var i int = 0
+	for name, _ := range con {
+		names[i] = name
+		i++
+	}
+	
+	return names
+}
+
+func (s *Spider) GetContentValue(urlName, contentName string) *regexp.Regexp {
+	return s.contents[urlName][contentName]
+}

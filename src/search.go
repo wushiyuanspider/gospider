@@ -6,18 +6,26 @@ import (
 	"fmt"
 )
 
+// 用于当前页面爬取到的数据
+type KeyData map[string][][]string
+
+// 对应的字段都是保存当前页的值
 type Searcher struct {
+	// 当前页面的源代码
 	html string
+	// 当前页面每条URL规则所匹配到的全部URL
 	urls map[string][]string
+	// 当前页面的深度
 	depth int
 }
 
 // 爬取网络内容的入口函数
 func Run(spider *Spider) {
 	var S Searcher
-	S.getHtmlByUrl(spider.StartURL)
+	S.getHtmlByUrl("http://blog.csdn.net/mybc724")
 	S.getURLsFromPage(spider)
-	
+	data, _ := S.getDataFromPage("article", spider)
+	fmt.Println(data)
 	/* 测试getURLsFromPage
 	for k, v := range S.urls {
 		fmt.Printf("name: %s\n", k)
@@ -77,4 +85,23 @@ func (s *Searcher) getURLsFromPage(spider *Spider) error {
 	}
 	
 	return nil
+}
+
+func (s *Searcher) getDataFromPage(urlName string, spider *Spider) (KeyData, error) {
+	if urlName == "" {
+		return nil, fmt.Errorf("URL's name can't empty!")
+	}
+	// contentName is a slice
+	contentNames := spider.GetContentNames(urlName)
+	
+	// 初始化用于保存结果的map
+	data := make(KeyData, len(contentNames))
+	for _, name := range contentNames {
+		// 获取每一个名字对应的正则表达式
+		re := spider.GetContentValue(urlName, name)
+		// 将匹配到的内容匹配到对应的名称下
+		data[name] = re.FindAllStringSubmatch(s.html, -1)
+	}
+	
+	return data, nil
 }
