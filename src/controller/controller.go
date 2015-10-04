@@ -21,9 +21,9 @@ func Init(filepath string, msg bool) {
 		return
 	}
 	if msg {
-		fmt.Println("Name:\t", spider.Name)
-		fmt.Println("StartURL:\t", spider.StartURL)
-		fmt.Println("Depth:\t", spider.Depth)
+		fmt.Println("Name:      ", spider.Name)
+		fmt.Println("StartURL:  ", spider.StartURL)
+		fmt.Println("Depth:     ", spider.Depth)
 	}
 }
 
