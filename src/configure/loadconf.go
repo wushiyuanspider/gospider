@@ -1,4 +1,4 @@
-package main
+package configure
 
 import (
 	"fmt"
@@ -29,19 +29,19 @@ func NewSpider(filepath string) (*Spider, error) {
 	}
 
 	spider.Name, err = conf.GetValue("core", "name")
-    if err != nil {
-        return nil, err
-    }
-    
+	if err != nil {
+		return nil, err
+	}
+
 	spider.StartURL, err = conf.GetValue("core", "startURL")
-    if err != nil {
-        return nil, err
-    }
-    
+	if err != nil {
+		return nil, err
+	}
+
 	spider.Depth, err = conf.Int("core", "depth")
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
 	// 获得待匹配URL的正则表达式列表
 	urls, err := conf.GetSection("url")
@@ -49,10 +49,10 @@ func NewSpider(filepath string) (*Spider, error) {
 		return nil, err
 	}
 
-    // 初始化外层的map
+	// 初始化外层的map
 	spider.urls = make(map[string]*regexp.Regexp, len(urls))
 	spider.contents = make(map[string]map[string]*regexp.Regexp, len(urls))
-	
+
 	// 编译用于匹配URL的正则表达式
 	for k, v := range urls {
 		re_url, err := regexp.Compile(v)
@@ -75,7 +75,7 @@ func NewSpider(filepath string) (*Spider, error) {
 				} else {
 					spider.contents[k][x] = re_con
 				}
-			} 
+			}
 		}
 	}
 
@@ -119,7 +119,7 @@ func (s *Spider) GetContentNames(urlName string) []string {
 		names[i] = name
 		i++
 	}
-	
+
 	return names
 }
 

@@ -1,9 +1,10 @@
-package main
+package fetch
 
 import (
-	"net/http"
-	"io/ioutil"
 	"fmt"
+	"gospider/src/configure"
+	"io/ioutil"
+	"net/http"
 )
 
 // 用于当前页面爬取到的数据
@@ -19,28 +20,12 @@ type Searcher struct {
 	depth int
 }
 
-// 爬取网络内容的入口函数
-func Run(spider *Spider) {
-	var S Searcher
-	S.getHtmlByUrl("http://blog.csdn.net/mybc724")
-	S.getURLsFromPage(spider)
-	data, _ := S.getDataFromPage("article", spider)
-	fmt.Println(data)
-	/* 测试getURLsFromPage
-	for k, v := range S.urls {
-		fmt.Printf("name: %s\n", k)
-		for x, y := range v {
-			fmt.Printf("\t%d: %s\n", x + 1, y)
-		}
-	}*/
-}
-
 // 获得指定URL的网页源代码
-func (s *Searcher)getHtmlByUrl(url string) error {
+func (s *Searcher) GetHtmlByUrl(url string) error {
 	if url == "" {
 		return fmt.Errorf("URL不能为空！")
 	}
-	
+
 	res, err := http.Get(url)
 	defer res.Body.Close()
 	if err != nil {
@@ -50,19 +35,19 @@ func (s *Searcher)getHtmlByUrl(url string) error {
 	if res.StatusCode != 200 {
 		return fmt.Errorf("Can't deal this code: ", res.StatusCode)
 	}
-	
+
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
-	
+
 	s.html = string(body)
 	return nil
-	
+
 }
 
 // 从页面中获取指定的URL
-func (s *Searcher) getURLsFromPage(spider *Spider) error {
+func (s *Searcher) GetURLsFromPage(spider *configure.Spider) error {
 	if s.html == "" {
 		return fmt.Errorf("Please get Html source first!")
 	}
@@ -70,7 +55,7 @@ func (s *Searcher) getURLsFromPage(spider *Spider) error {
 	if len(urlnames) == 0 {
 		return fmt.Errorf("URL is empty!")
 	}
-	
+
 	s.urls = make(map[string][]string, len(urlnames))
 	for _, name := range urlnames {
 		// 忽略slice中可能产生的气泡
@@ -79,21 +64,21 @@ func (s *Searcher) getURLsFromPage(spider *Spider) error {
 		}
 		re := spider.GetURLByName(name)
 		if re == nil {
-			return  fmt.Errorf("There is nothing in ", name)
+			return fmt.Errorf("There is nothing in ", name)
 		}
 		s.urls[name] = re.FindAllString(s.html, -1)
 	}
-	
+
 	return nil
 }
 
-func (s *Searcher) getDataFromPage(urlName string, spider *Spider) (KeyData, error) {
+func (s *Searcher) GetDataFromPage(urlName string, spider *configure.Spider) (KeyData, error) {
 	if urlName == "" {
 		return nil, fmt.Errorf("URL's name can't empty!")
 	}
 	// contentName is a slice
 	contentNames := spider.GetContentNames(urlName)
-	
+
 	// 初始化用于保存结果的map
 	data := make(KeyData, len(contentNames))
 	for _, name := range contentNames {
@@ -102,6 +87,6 @@ func (s *Searcher) getDataFromPage(urlName string, spider *Spider) (KeyData, err
 		// 将匹配到的内容匹配到对应的名称下
 		data[name] = re.FindAllStringSubmatch(s.html, -1)
 	}
-	
+
 	return data, nil
 }
