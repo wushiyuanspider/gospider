@@ -13,11 +13,11 @@ type KeyData map[string][][]string
 // 对应的字段都是保存当前页的值
 type Searcher struct {
 	// 当前页面的源代码
-	html string
+	Html string
 	// 当前页面每条URL规则所匹配到的全部URL
-	urls map[string][]string
+	Urls map[string][]string
 	// 当前页面的深度
-	depth int
+	Depth int
 }
 
 // 获得指定URL的网页源代码
@@ -41,14 +41,14 @@ func (s *Searcher) GetHtmlByUrl(url string) error {
 		return err
 	}
 
-	s.html = string(body)
+	s.Html = string(body)
 	return nil
 
 }
 
 // 从页面中获取指定的URL
 func (s *Searcher) GetURLsFromPage(spider *configure.Spider) error {
-	if s.html == "" {
+	if s.Html == "" {
 		return fmt.Errorf("Please get Html source first!")
 	}
 	urlnames := spider.GetURLName()
@@ -56,7 +56,7 @@ func (s *Searcher) GetURLsFromPage(spider *configure.Spider) error {
 		return fmt.Errorf("URL is empty!")
 	}
 
-	s.urls = make(map[string][]string, len(urlnames))
+	s.Urls = make(map[string][]string, len(urlnames))
 	for _, name := range urlnames {
 		// 忽略slice中可能产生的气泡
 		if name == "" {
@@ -66,7 +66,7 @@ func (s *Searcher) GetURLsFromPage(spider *configure.Spider) error {
 		if re == nil {
 			return fmt.Errorf("There is nothing in ", name)
 		}
-		s.urls[name] = re.FindAllString(s.html, -1)
+		s.Urls[name] = re.FindAllString(s.Html, -1)
 	}
 
 	return nil
@@ -85,8 +85,20 @@ func (s *Searcher) GetDataFromPage(urlName string, spider *configure.Spider) (Ke
 		// 获取每一个名字对应的正则表达式
 		re := spider.GetContentValue(urlName, name)
 		// 将匹配到的内容匹配到对应的名称下
-		data[name] = re.FindAllStringSubmatch(s.html, -1)
+		data[name] = re.FindAllStringSubmatch(s.Html, -1)
 	}
 
 	return data, nil
+}
+
+// 返回URL分组
+func (s *Searcher) URLGroupNames() []string {
+	groups := make([]string, len(s.Urls))
+	i := 0
+	for k, _ := range s.Urls {
+		groups[i] = k
+		i++
+	}
+
+	return groups
 }

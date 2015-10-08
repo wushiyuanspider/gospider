@@ -126,3 +126,6 @@ func (s *Spider) GetContentNames(urlName string) []string {
 func (s *Spider) GetContentValue(urlName, contentName string) *regexp.Regexp {
 	return s.contents[urlName][contentName]
 }
+
+// 返回URL有多少组
+func (s *Spider) NumURLGroup() int { return len(s.urls) }
