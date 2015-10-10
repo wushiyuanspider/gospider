@@ -9,7 +9,7 @@ import (
 var (
 	// 获取一个全局的spider
 	spider *configure.Spider
-	// 获取一个全局的Searcher(无需初始化)
+	// 获取一个全局的Searcher
 	searcher *fetch.Searcher
 	// 全局错误变量
 	err error
@@ -35,6 +35,7 @@ func Init(filepath string, msg bool) {
 	QURL = NewQueue()
 
 	urlGroup = make([]string, spider.NumURLGroup())
+	searcher = new(fetch.Searcher)
 }
 
 // 爬取网络内容的入口函数
@@ -45,9 +46,17 @@ func Run() {
 	err = searcher.GetURLsFromPage(spider)
 	if err != nil {}
 	urlGroup = searcher.URLGroupNames()
-	fmt.Println(urlGroup)
-	currGroup := prepareURL()
-	fmt.Println(currGroup)
+	for currGroup := prepareURL(); currGroup != ""; currGroup = prepareURL() {
+		// 将当前分组中的每一个URL添加到队列中去
+		for _, url := range searcher.Urls[currGroup] {
+			QURL.Put(url)
+		}
+		// 获取连接的HTML代码
+		searcher.GetHtmlByUrl(QURL.Get())
+		data,_ := searcher.GetDataFromPage(currGroup, spider)
+		fmt.Println(data)
+	}
+
 
 }
 
@@ -56,7 +65,6 @@ func start() {
 	QURL.Put(spider.StartURL)
 	// 获得StartURL的HTML
 	searcher.GetHtmlByUrl(QURL.Get())
-
 }
 
 // 每一次调用，都将一类URL写入队列中，并将类名返回
@@ -74,4 +82,8 @@ func prepareURL() string {
 		}
 	}
 	return ""
+}
+
+func addURLToQueue(groupName string) {
+
 }
