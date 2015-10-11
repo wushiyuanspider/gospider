@@ -10,6 +10,7 @@ import (
 type Spider struct {
 	Name           string
 	StartURL       string
+	Root           string
 	Depth          int
 	urls           map[string]*regexp.Regexp
 	contents       map[string]map[string]*regexp.Regexp
@@ -33,9 +34,18 @@ func NewSpider(filepath string) (*Spider, error) {
 		return nil, err
 	}
 
-	spider.StartURL, err = conf.GetValue("core", "startURL")
+	spider.StartURL, err = conf.GetValue("core", "start")
 	if err != nil {
 		return nil, err
+	}
+
+	spider.Root, err = conf.GetValue("core", "root")
+	if err != nil {
+		return nil, err
+	} else {
+		if spider.Root == "start" {
+			spider.Root = spider.StartURL
+		}
 	}
 
 	spider.Depth, err = conf.Int("core", "depth")

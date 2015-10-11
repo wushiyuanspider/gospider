@@ -47,10 +47,6 @@ func Run() {
 	if err != nil {}
 	urlGroup = searcher.URLGroupNames()
 	for currGroup := prepareURL(); currGroup != ""; currGroup = prepareURL() {
-		// 将当前分组中的每一个URL添加到队列中去
-		for _, url := range searcher.Urls[currGroup] {
-			QURL.Put(url)
-		}
 		// 获取连接的HTML代码
 		searcher.GetHtmlByUrl(QURL.Get())
 		data,_ := searcher.GetDataFromPage(currGroup, spider)
@@ -82,8 +78,4 @@ func prepareURL() string {
 		}
 	}
 	return ""
-}
-
-func addURLToQueue(groupName string) {
-
 }

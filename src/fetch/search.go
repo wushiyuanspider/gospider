@@ -87,7 +87,6 @@ func (s *Searcher) GetDataFromPage(urlName string, spider *configure.Spider) (Ke
 		// 将匹配到的内容匹配到对应的名称下
 		data[name] = re.FindAllStringSubmatch(s.Html, -1)
 	}
-
 	return data, nil
 }
 

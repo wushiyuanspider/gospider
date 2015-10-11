@@ -3,6 +3,7 @@ package controller
 
 import (
 	"container/list"
+	"strings"
 )
 
 // 处理URL的队列
@@ -45,6 +46,16 @@ func (q *queue) IsExist(url string) bool {
 
 // 将url放入队列中
 func (q *queue) Put(url string) {
+	// 对入队的URL处理成统一的格式，并过滤掉不需要的地址
+	// 过滤掉以http开头并且不为http://Root的站外地址
+	if strings.Index(url, "http") == 0 &&
+		strings.Index(url, spider.Root) == -1 {
+		return
+	}
+	// 补全以/开头的地址
+	if strings.Index(url, "/") == 0 {
+		url = spider.Root + url
+	}
 	// 如果这个url不存在，就将它放到队列当中去
 	if !q.IsExist(url) {
 		q.urls.PushBack(url)
