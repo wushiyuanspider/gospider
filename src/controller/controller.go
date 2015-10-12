@@ -48,19 +48,22 @@ func Run() {
 	urlGroup = searcher.URLGroupNames()
 	for currGroup := prepareURL(); currGroup != ""; currGroup = prepareURL() {
 		// 获取连接的HTML代码
-		searcher.GetHtmlByUrl(QURL.Get())
-		data,_ := searcher.GetDataFromPage(currGroup, spider)
-		fmt.Println(data)
+		for url := QURL.Get(); url != ""; url = QURL.Get() {
+			searcher.GetHtmlByUrl(url)
+			data,_ := searcher.GetDataFromPage(currGroup, spider)
+			PrintKeyData(data)
+		}
+
 	}
 
 
 }
 
 func start() {
-	// 将初始URL放入队列中
-	QURL.Put(spider.StartURL)
+	// 将初始URL无需放入队列中
+	// 因为规则没有匹配到的话，则后面就不会再出现了
 	// 获得StartURL的HTML
-	searcher.GetHtmlByUrl(QURL.Get())
+	searcher.GetHtmlByUrl(spider.StartURL)
 }
 
 // 每一次调用，都将一类URL写入队列中，并将类名返回
@@ -78,4 +81,14 @@ func prepareURL() string {
 		}
 	}
 	return ""
+}
+
+// [test]
+// 输出测试数据
+func PrintKeyData(data fetch.KeyData) {
+	for _, v := range data {
+		for _, x := range v {
+			fmt.Println(x[1])
+		}
+	}
 }

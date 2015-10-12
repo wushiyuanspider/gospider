@@ -64,6 +64,10 @@ func (q *queue) Put(url string) {
 
 // 返回队首的url，并将它标记为已处理
 func (q *queue) Get() string {
+	// 处理链表为空的情况，防止空指针
+	if q.Len_urls() == 0 {
+		return ""
+	}
 	front := q.urls.Remove(q.urls.Front())
 	if str, ok := front.(string); ok {
 		q.used.PushFront(str)
