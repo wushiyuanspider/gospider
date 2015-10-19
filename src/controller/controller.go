@@ -17,6 +17,8 @@ var (
 	QURL *queue
 	// 获取到的URL的种类
 	urlGroup []string
+	// 已经匹配到的深度
+	depth int
 )
 
 // 初始化环境
@@ -48,7 +50,7 @@ func Run() {
 	urlGroup = searcher.URLGroupNames()
 	for currGroup := prepareURL(); currGroup != ""; currGroup = prepareURL() {
 		// 获取连接的HTML代码
-		for url := QURL.Get(); url != ""; url = QURL.Get() {
+		for _, url := QURL.Get(); url != ""; _,url = QURL.Get() {
 			searcher.GetHtmlByUrl(url)
 			data,_ := searcher.GetDataFromPage(currGroup, spider)
 			PrintKeyData(data)
@@ -74,7 +76,7 @@ func prepareURL() string {
 			// 实际每次只处理一组
 			urls = searcher.Urls[v]
 			for _, url := range urls {
-				QURL.Put(url)
+				QURL.Put("", url)
 			}
 			urlGroup[i] = ""
 			return v
