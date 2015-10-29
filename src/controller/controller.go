@@ -15,8 +15,6 @@ var (
 	err error
 	// URL队列
 	QURL *queue
-	// 获取到的URL的种类
-	urlGroup []string
 	// 已经匹配到的深度
 	depth int
 )
@@ -36,29 +34,26 @@ func Init(filepath string, msg bool) {
 	// 初始化URL队列
 	QURL = NewQueue()
 
-	urlGroup = make([]string, spider.NumURLGroup())
+	//urlGroup = make([]string, spider.NumURLGroup())
 	searcher = new(fetch.Searcher)
 }
 
 // 爬取网络内容的入口函数
 func Run() {
 	start()
-
-	// 获取当前页面的URL
-	err = searcher.GetURLsFromPage(spider)
-	if err != nil {}
-	urlGroup = searcher.URLGroupNames()
-	for currGroup := prepareURL(); currGroup != ""; currGroup = prepareURL() {
-		// 获取连接的HTML代码
-		for _, url := QURL.Get(); url != ""; _,url = QURL.Get() {
-			searcher.GetHtmlByUrl(url)
-			data,_ := searcher.GetDataFromPage(currGroup, spider)
-			PrintKeyData(data)
-		}
-
+	
+	name, url := QURL.Get()
+	for ; name != "" && url != ""; name, url = QURL.Get(){
+		searcher.GetHtmlByUrl(url)
+		searcher.GetURLsFromPage(spider)
+		prepareURL()
+		data, _ := searcher.GetDataFromPage(name, spider)
+		// 打印抓取到的结果
+		fmt.Println(data["info"][0][1])
 	}
 
-
+	fmt.Println("urls: ", QURL.Len_urls())
+	fmt.Println("used_urls: ", QURL.Len_used())
 }
 
 func start() {
@@ -66,23 +61,20 @@ func start() {
 	// 因为规则没有匹配到的话，则后面就不会再出现了
 	// 获得StartURL的HTML
 	searcher.GetHtmlByUrl(spider.StartURL)
+	// 获取首页上的URL
+	searcher.GetURLsFromPage(spider)
+	// 将获取到的url加入队列中去
+	prepareURL()
 }
 
-// 每一次调用，都将一类URL写入队列中，并将类名返回
-func prepareURL() string {
-	var urls []string
-	for i, v := range urlGroup {
-		if v != "" {
-			// 实际每次只处理一组
-			urls = searcher.Urls[v]
-			for _, url := range urls {
-				QURL.Put("", url)
-			}
-			urlGroup[i] = ""
-			return v
+// 将当前页面中的url写入队列中去
+func prepareURL() {
+	for name, urls := range searcher.Urls {
+		for _, url := range urls {
+			QURL.Put(name, url)
 		}
 	}
-	return ""
+	
 }
 
 // [test]
