@@ -11,7 +11,7 @@ type Spider struct {
 	Name           string
 	StartURL       string
 	Root           string
-	Depth          int
+	Count          int
 	urls           map[string]*regexp.Regexp
 	contents       map[string]map[string]*regexp.Regexp
 	MatchedURL     int
@@ -48,7 +48,7 @@ func NewSpider(filepath string) (*Spider, error) {
 		}
 	}
 
-	spider.Depth, err = conf.Int("core", "depth")
+	spider.Count, err = conf.Int("core", "count")
 	if err != nil {
 		return nil, err
 	}

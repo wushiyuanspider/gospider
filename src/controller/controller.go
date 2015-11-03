@@ -16,7 +16,7 @@ var (
 	// URL队列
 	QURL *queue
 	// 已经匹配到的深度
-	depth int
+	count int = 0
 )
 
 // 初始化环境
@@ -29,7 +29,7 @@ func Init(filepath string, msg bool) {
 	if msg {
 		fmt.Println("Name:      ", spider.Name)
 		fmt.Println("StartURL:  ", spider.StartURL)
-		fmt.Println("Depth:     ", spider.Depth)
+		fmt.Println("Depth:     ", spider.Count)
 	}
 	// 初始化URL队列
 	QURL = NewQueue()
@@ -43,11 +43,12 @@ func Run() {
 	start()
 	
 	name, url := QURL.Get()
-	for ; name != "" && url != ""; name, url = QURL.Get(){
+	for ; name != "" && url != "" && count <= spider.Count; name, url = QURL.Get() {
 		searcher.GetHtmlByUrl(url)
 		searcher.GetURLsFromPage(spider)
 		prepareURL()
 		data, _ := searcher.GetDataFromPage(name, spider)
+		count++
 		// 打印抓取到的结果
 		fmt.Println(data["info"][0][1])
 	}
