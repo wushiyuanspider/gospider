@@ -50,7 +50,8 @@ func Run() {
 		data, _ := searcher.GetDataFromPage(name, spider)
 		count++
 		// 打印抓取到的结果
-		fmt.Println(data["info"][0][1])
+		fmt.Print(data["name"][0][1], "  -----  ")
+		fmt.Println(data["pay"][0][1])
 	}
 
 	fmt.Println("urls: ", QURL.Len_urls())
