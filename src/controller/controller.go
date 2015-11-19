@@ -3,6 +3,7 @@ package controller
 import (
 	"gospider/src/configure"
 	"gospider/src/fetch"
+	"gospider/src/output"
 	"fmt"
 )
 
@@ -43,6 +44,8 @@ func Run() {
 	start()
 	
 	name, url := QURL.Get()
+	out := output.NewFile("csdn.txt")
+	defer out.Close()
 	for ; name != "" && url != "" && count <= spider.Count; name, url = QURL.Get() {
 		searcher.GetHtmlByUrl(url)
 		searcher.GetURLsFromPage(spider)
@@ -50,12 +53,11 @@ func Run() {
 		data, _ := searcher.GetDataFromPage(name, spider)
 		count++
 		// 打印抓取到的结果
-		fmt.Print(data["name"][0][1], "  -----  ")
-		fmt.Println(data["pay"][0][1])
+		out.Output(output.OutputType(data))
 	}
-
-	fmt.Println("urls: ", QURL.Len_urls())
-	fmt.Println("used_urls: ", QURL.Len_used())
+	
+	//fmt.Println("urls: ", QURL.Len_urls())
+	//fmt.Println("used_urls: ", QURL.Len_used())
 }
 
 func start() {
